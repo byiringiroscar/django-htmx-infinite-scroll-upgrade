@@ -80,7 +80,7 @@ def delete_film(request, pk):
     return render(request, 'partials/film-list.html', {'films': films})
 
 
-
+@login_required
 def search_film(request):
     search_text = request.POST.get('search')
     userfilms  = UserFilms.objects.filter(user=request.user)
@@ -130,4 +130,15 @@ def upload_photo(request, pk):
     context = {
         'userfilm': userfilm
     }
+    return render(request, 'partials/film-detail.html', context)
+
+
+@login_required
+def film_detail_name(request, name):
+    film = Film.objects.get(name=name)
+    userfilm = get_object_or_404(UserFilms, film=film)
+    context = {
+        'userfilm': userfilm
+    }
+
     return render(request, 'partials/film-detail.html', context)

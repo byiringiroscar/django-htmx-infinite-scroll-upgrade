@@ -19,9 +19,7 @@
         {% if films %}
         <form class="sortable list-group col-xs-12" hx-trigger="end" hx-post="{% url 'sort' %}" hx-target="#film-list">
             <div class="htmx-indicator">Updating...</div>
-        {% for film in films %}
-                 {% include "partials/film-list-elements.html" %} 
-            {% endfor %}
+            {% include "partials/film-list-elements.html" %}
             </form>
         {% else %}
             <p>You do not have any films in your list</p>

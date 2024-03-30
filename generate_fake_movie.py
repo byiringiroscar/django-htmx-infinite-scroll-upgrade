@@ -7,15 +7,14 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "htmx.settings")
 django.setup()
 
 
-from films.models import Film
+from films.models import Film, UserFilms
 from faker import Faker
+from films.utils import get_max_order
+
+
+user  = get_user_model().objects.get(id=1)
 
 fake = Faker()
-
-try:
-    user = get_user_model().objects.get(id=1)
-except:
-    print('user with id 1 not found')
    
 
 for _ in range(100):
@@ -24,6 +23,20 @@ for _ in range(100):
         film.save()
     except:
         pass
+
+
+print(f'Fake data generation completed ')
+
+# Add film to the user
+
+
+for film in Film.objects.all():
+    if not UserFilms.objects.filter(user=user, film=film).exists():
+        UserFilms.objects.create(
+            user=user,
+            film=film,
+            order=get_max_order(user)
+        )
 
 
 print(f'Fake data generation completed ')

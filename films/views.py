@@ -51,6 +51,11 @@ class FilmList(ListView):
     paginate_by = 20
     context_object_name = 'films'
 
+    def get_template_names(self):
+        if self.request.htmx:
+            return 'partials/film-list-elements.html'
+        return 'films.html'
+
     def get_queryset(self):
         return UserFilms.objects.filter(user=self.request.user)
     

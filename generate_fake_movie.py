@@ -20,10 +20,8 @@ except:
 
 for _ in range(100):
     try:
-        Film.objects.create(
-            name=fake.text(10),
-            user = user
-        )
+        film = Film(name=fake.text(10))
+        film.save()
     except:
         pass
 

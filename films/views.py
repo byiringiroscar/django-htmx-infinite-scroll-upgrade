@@ -12,6 +12,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.decorators.http import require_http_methods
 from films.utils import get_max_order, reorder
 from django.contrib import messages
+from django.conf import settings
 
 from films.forms import RegisterForm
 
@@ -48,7 +49,7 @@ def check_username(request):
 class FilmList(ListView):
     template_name = 'films.html'
     model = UserFilms
-    paginate_by = 20
+    paginate_by = settings.PAGINATE_BY
     context_object_name = 'films'
 
     def get_template_names(self):
@@ -57,7 +58,7 @@ class FilmList(ListView):
         return 'films.html'
 
     def get_queryset(self):
-        return UserFilms.objects.filter(user=self.request.user)
+        return UserFilms.objects.prefetch_related('film').filter(user=self.request.user)
     
 @login_required
 def add_film(request):

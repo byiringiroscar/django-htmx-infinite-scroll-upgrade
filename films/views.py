@@ -6,7 +6,7 @@ from django.views.generic import FormView, TemplateView
 from django.contrib.auth import get_user_model
 from films.models import Film, UserFilms
 from django.views.generic import ListView
-
+from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.decorators.http import require_http_methods
@@ -107,12 +107,17 @@ def clear(request):
 def sort(request):
     film_pks_order = request.POST.getlist('film_order')
     films = []
+    userfilms = UserFilms.objects.filter(user=request.user)
     for idx, film_pk in enumerate(film_pks_order, start=1):
-        userfilm = UserFilms.objects.get(pk=film_pk)
+        # userfilm = UserFilms.objects.get(pk=film_pk)
+        userfilm = next(u for u in userfilms if u.pk == int(film_pk))
         userfilm.order = idx
         userfilm.save()
         films.append(userfilm)
-    return render(request, 'partials/film-list.html', {'films': films})
+    paginator = Paginator(films, settings.PAGINATE_BY)
+    page_number = len(film_pks_order) / settings.PAGINATE_BY
+    page_obj  = paginator.get_page(page_number)
+    return render(request, 'partials/film-list.html', {'films': films, 'page_obj': page_obj})
 
 @login_required
 def detail(request, pk):

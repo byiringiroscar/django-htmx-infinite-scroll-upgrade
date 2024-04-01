@@ -107,13 +107,16 @@ def clear(request):
 def sort(request):
     film_pks_order = request.POST.getlist('film_order')
     films = []
-    userfilms = UserFilms.objects.filter(user=request.user)
+    updated_films = []
+    userfilms = UserFilms.objects.prefetch_related('film').filter(user=request.user)
     for idx, film_pk in enumerate(film_pks_order, start=1):
         # userfilm = UserFilms.objects.get(pk=film_pk)
         userfilm = next(u for u in userfilms if u.pk == int(film_pk))
-        userfilm.order = idx
-        userfilm.save()
+        if userfilm.order != idx:
+            userfilm.order = idx
+            updated_films.append(userfilm)
         films.append(userfilm)
+    UserFilms.objects.bulk_update(updated_films, ['order'])
     paginator = Paginator(films, settings.PAGINATE_BY)
     page_number = len(film_pks_order) / settings.PAGINATE_BY
     page_obj  = paginator.get_page(page_number)
